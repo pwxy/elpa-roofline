@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# cori gpu
+# will need to issue the following sometime before running benchmark_elpa
+#
+# module purge ; module load esslurm; module load intel/19.0.3.199; module load cuda/10.2.89; module load openmpi/4.0.3
+
+# request one compute node on cori gpu
+# salloc -C gpu -N 1 -G 8 -t 30 -A m1759 -q special --exclusive
+
+#
+
+export OMP_NUM_THREADS=1
+
+# ELPA requires block sizes of powers of 2
+# example to run on all 8 GPUs on a compute node
+
+srun -N 1 -n 8 -c 10 --cpu_bind=cores ./benchmark_elpa 4096 4 2 32
+
+
+
+
+
+
+# ignore warnings such as the following:
+#
+#[1597242445.241043] [cgpu04:25499:0]    ucp_context.c:586  UCX  WARN  transport 'cuda_copy' is not available
+#[1597242445.241050] [cgpu04:25499:0]    ucp_context.c:586  UCX  WARN  transport 'gdr_copy' is not available
+#[1597242445.241051] [cgpu04:25499:0]    ucp_context.c:586  UCX  WARN  transport 'cuda_ipc' is not available

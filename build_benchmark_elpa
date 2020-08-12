@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# cori gpu
+#module purge ; module load esslurm; module load intel/19.0.3.199; module load cuda/10.2.89; module load openmpi/4.0.3
+
+elpa_version=2020.05.001
+elpa_suffix=
+plat=gpu
+
+
+export base_dir=/global/common/software/m1759/elpa
+
+export FFLAGS="-I${base_dir}/install/${elpa_version}/${plat}-intel_${INTEL_VERSION}-cuda_${CUDA_VERSION}/include/elpa${elpa_suffix}-${elpa_version}/modules -I${base_dir}/install/${elpa_version}/${plat}-intel_${INTEL_VERSION}-cuda_${CUDA_VERSION}/include/elpa${elpa_suffix}-${elpa_version}/elpa"
+
+# no OMP
+export LDFLAGS="-L${base_dir}/install/${elpa_version}/${plat}-intel_${INTEL_VERSION}-cuda_${CUDA_VERSION}/lib -lelpa${elpa_suffix} -L/usr/common/software/cuda/${CUDA_VERSION}/lib64 -lcublas -lcudart -L${INTEL_PATH}/linux/mkl/lib/intel64_lin -lmkl_scalapack_lp64 -lmkl_blacs_openmpi_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core"
+
+echo "mpif90 -O2 -o benchmark_elpa benchmark_elpa.f90 ${FFLAGS} ${LDFLAGS}"
+mpif90 -O2 -o benchmark_elpa benchmark_elpa.f90 ${FFLAGS} ${LDFLAGS}
