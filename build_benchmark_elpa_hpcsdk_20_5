@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# build on cori gpu:
+# module purge ; module load esslurm; module load hpcsdk/20.5; module load cuda/11.0.2; module load openmpi/4.0.3
+
+elpa_version=2020.05.001
+elpa_suffix=
+plat=gpu
+
+
+export base_dir=/global/common/software/m1759/elpa
+export elpa_dir=${base_dir}/install/${elpa_version}/${plat}-ompi_4_0_3-hpcsdk_${HPCSDK_VERSION}-cuda_${CUDA_VERSION}
+export elpa_inc_dir=${elpa_dir}/include/elpa${elpa_suffix}-${elpa_version}
+export scalapack_dir=${base_dir}/scalapack/install/scalapack-2.1.0/skx-ompi_4_0_3-hpcdsk_${HPCSDK_VERSION}-cuda_${CUDA_VERSION}
+
+export FFLAGS="-I${elpa_inc_dir}/modules -I${elpa_inc_dir}/elpa"
+
+# no OMP
+export LDFLAGS="-L${elpa_dir}/lib -lelpa${elpa_suffix} -L/usr/common/software/cuda/${CUDA_VERSION}/lib64 -lcublas -lcudart -L${scalapack_dir} -lscalapack -llapack -lblas"
+
+echo "mpif90 -O2 -o benchmark_elpa benchmark_elpa.f90 ${FFLAGS} ${LDFLAGS}"
+mpif90 -O2 -o benchmark_elpa benchmark_elpa.f90 ${FFLAGS} ${LDFLAGS}
